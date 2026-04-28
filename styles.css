@@ -518,13 +518,22 @@ h2,
   max-width: 1240px;
 }
 
-.back-link {
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.back-link,
+.viz-cta {
   display: inline-flex;
   min-height: 2.6rem;
   align-items: center;
   gap: 0.55rem;
   width: fit-content;
-  border: 1px solid #ff9fba;
+  border: 1px solid rgba(255, 159, 186, 0.86);
   border-radius: 999px;
   background: rgba(12, 10, 28, 0.72);
   color: #f8eef5;
@@ -532,10 +541,11 @@ h2,
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
   font-size: 0.86rem;
   font-weight: 600;
-  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 }
 
-.back-link:hover {
+.back-link:hover,
+.viz-cta:hover {
   border-color: #ffc0d1;
   background: rgba(25, 17, 45, 0.9);
   color: #fff;
@@ -903,28 +913,11 @@ h2,
 }
 
 .viz-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  margin-top: 0.25rem;
-  min-height: 2.6rem;
-  width: fit-content;
-  border: 1px solid rgba(167, 139, 250, 0.4);
-  border-radius: 999px;
-  background: rgba(139, 92, 246, 0.13);
-  color: #ede9fe;
   padding: 0 1.15rem;
-  font-size: 0.86rem;
-  font-weight: 600;
-  transition: all 180ms ease;
 }
 
 .viz-cta:hover {
-  border-color: rgba(167, 139, 250, 0.7);
-  background: rgba(139, 92, 246, 0.22);
-  color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 0 22px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 0 22px rgba(255, 159, 186, 0.16);
 }
 
 .viz-cta-icon {

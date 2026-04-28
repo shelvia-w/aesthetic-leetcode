@@ -43,7 +43,10 @@ if (problem && detailPage) {
     : "";
 
   detailPage.innerHTML = `
-    <a class="back-link" href="../index.html"><span aria-hidden="true">←</span> Back to Home</a>
+    <div class="detail-actions">
+      <a class="back-link" href="../index.html"><span aria-hidden="true">←</span> Back to Home</a>
+      ${vizCta}
+    </div>
     <section class="problem-page-card">
       <figure class="detail-media ${problem.accent}" aria-label="${problem.title} infographic">
         <img src="../${problem.imagePath}" alt="${problem.title} coding pattern infographic" />
@@ -58,7 +61,6 @@ if (problem && detailPage) {
         <section class="examples" aria-label="${problem.title} examples">
           ${examples}
         </section>
-        ${vizCta}
       </div>
     </section>
   `;
