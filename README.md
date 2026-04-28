@@ -1,4 +1,4 @@
-# Aesthetic Leetcode
+# Aesthetic LeetCode
 
 Aesthetic LeetCode turns algorithm practice into a visual, interactive, and beginner-friendly learning experience.
 https://shelvia-w.github.io/aesthetic-leetcode/
