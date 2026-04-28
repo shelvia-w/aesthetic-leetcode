@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Valid Palindrome Visualizer | Aesthetic LeetCode</title>
+    <meta name="description" content="Interactive two-pointer palindrome checker visualizer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="valid-palindrome-visualizer.css" />
+  </head>
+  <body>
+    <main class="viz-shell">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Problems</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <a href="../problems/valid-palindrome.html">Valid Palindrome</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <span aria-current="page">Visualizer</span>
+      </nav>
+
+      <header class="viz-header">
+        <h1>Valid Palindrome Visualizer</h1>
+        <p class="viz-subtitle">Watch two pointers compare characters from both ends.</p>
+      </header>
+
+      <section class="input-section" aria-label="Input">
+        <label class="input-wrap">
+          <span class="input-label">Enter a word or phrase</span>
+          <input id="vizInput" type="text" value="racecar" autocomplete="off" spellcheck="false" />
+        </label>
+        <p class="cleaned-display" id="cleanedDisplay">Cleaned: <code id="cleanedText">racecar</code></p>
+      </section>
+
+      <section class="visualizer-card" aria-label="Visualization">
+        <div class="tiles-container" id="tilesContainer"></div>
+
+        <div class="step-state" id="stepState">
+          <p class="comparison" id="comparisonText">Press Start to begin</p>
+          <p class="step-message" id="stepMessage">Enter a string and start the visualizer.</p>
+        </div>
+
+        <div class="result-badge hidden" id="resultBadge"></div>
+      </section>
+
+      <section class="controls" aria-label="Controls">
+        <button class="ctrl-btn" id="btnStart" type="button">Start</button>
+        <button class="ctrl-btn" id="btnNext" type="button" disabled>Next Step</button>
+        <button class="ctrl-btn" id="btnAuto" type="button" disabled>Auto Play</button>
+        <button class="ctrl-btn" id="btnPause" type="button" disabled>Pause</button>
+        <button class="ctrl-btn" id="btnReset" type="button">Reset</button>
+      </section>
+
+      <div class="bottom-cards">
+        <section class="info-card learning-card" aria-label="How it works">
+          <h2>How It Works</h2>
+          <div class="learning-steps">
+            <div class="learning-step">
+              <span class="step-num">1</span>
+              <span>Start with two pointers at both ends</span>
+            </div>
+            <div class="learning-step">
+              <span class="step-num">2</span>
+              <span>Compare characters at each pointer</span>
+            </div>
+            <div class="learning-step">
+              <span class="step-num">3</span>
+              <span>Move inward until mismatch or center</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="valid-palindrome-visualizer.js"></script>
+  </body>
+</html>

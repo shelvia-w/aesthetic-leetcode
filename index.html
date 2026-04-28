@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Aesthetic LeetCode</title>
+    <meta name="description" content="Leetcode problems, beautifully visualized" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <h1>Aesthetic LeetCode</h1>
+          <p class="tagline">
+            <span class="spark" aria-hidden="true"></span>
+            Leetcode problems, beautifully visualized
+          </p>
+        </div>
+
+        <div class="hero-actions">
+          <label class="search-wrap">
+            <span class="search-icon" aria-hidden="true"></span>
+            <span class="sr-only">Search problems</span>
+            <input id="searchInput" type="search" placeholder="Search problems..." autocomplete="off" />
+          </label>
+          <a class="nav-pill" href="concepts.html">Concepts</a>
+        </div>
+      </header>
+
+      <nav class="filters" aria-label="Problem filters" id="filters"></nav>
+
+      <section aria-label="Problem gallery">
+        <div class="grid" id="problemGrid"></div>
+        <p class="empty" id="emptyState" hidden>No problems match that search.</p>
+      </section>
+    </main>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

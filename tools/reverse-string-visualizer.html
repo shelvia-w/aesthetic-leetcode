@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reverse String Visualizer | Aesthetic LeetCode</title>
+    <meta name="description" content="Interactive two-pointer visualizer for Reverse String" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="reverse-string-visualizer.css" />
+  </head>
+  <body>
+    <main class="viz-shell">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Problems</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <a href="../problems/reverse-string.html">Reverse String</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <span aria-current="page">Visualizer</span>
+      </nav>
+
+      <header class="viz-header">
+        <h1>Reverse String Visualizer</h1>
+        <p class="viz-subtitle">Watch two pointers swap characters from outside in.</p>
+      </header>
+
+      <section class="input-section" aria-label="Input">
+        <div class="input-row">
+          <label class="input-wrap">
+            <span class="input-label">String</span>
+            <input id="arrayInput" type="text" value="hello" autocomplete="off" spellcheck="false" />
+          </label>
+        </div>
+      </section>
+
+      <section class="visualizer-card" aria-label="Visualization">
+        <div class="tiles-container" id="tilesContainer"></div>
+
+        <div class="swap-arrow hidden" id="swapArrow" aria-hidden="true">⇄</div>
+
+        <div class="step-state" id="stepState">
+          <p class="step-message" id="stepMessage">Enter a string, then start.</p>
+        </div>
+
+        <div class="result-area hidden" id="resultArea">
+          <div class="result-badge" id="resultBadge"></div>
+          <div class="result-details" id="resultDetails"></div>
+        </div>
+      </section>
+
+      <section class="controls" aria-label="Controls">
+        <button class="ctrl-btn" id="btnStart" type="button">Start</button>
+        <button class="ctrl-btn" id="btnNext" type="button" disabled>Next Step</button>
+        <button class="ctrl-btn" id="btnAuto" type="button" disabled>Auto Play</button>
+        <button class="ctrl-btn" id="btnPause" type="button" disabled>Pause</button>
+        <button class="ctrl-btn" id="btnReset" type="button">Reset</button>
+      </section>
+
+      <div class="bottom-cards">
+        <section class="info-card learning-card" aria-label="How it works">
+          <h2>How It Works</h2>
+          <div class="learning-steps">
+            <div class="learning-step">
+              <span class="step-num">1</span>
+              <span>Place pointers at the first and last characters</span>
+            </div>
+            <div class="learning-step">
+              <span class="step-num">2</span>
+              <span>Swap the characters at the two pointers</span>
+            </div>
+            <div class="learning-step">
+              <span class="step-num">3</span>
+              <span>Move both pointers inward and repeat until they meet</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="reverse-string-visualizer.js"></script>
+  </body>
+</html>
