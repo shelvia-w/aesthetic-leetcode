@@ -4,10 +4,9 @@ const comparisonText = document.getElementById("comparisonText");
 const stepMessage = document.getElementById("stepMessage");
 const resultBadge = document.getElementById("resultBadge");
 const cleanedTextEl = document.getElementById("cleanedText");
-const btnStart = document.getElementById("btnStart");
+const btnPrev = document.getElementById("btnPrev");
 const btnNext = document.getElementById("btnNext");
-const btnAuto = document.getElementById("btnAuto");
-const btnPause = document.getElementById("btnPause");
+const btnPlay = document.getElementById("btnPlay");
 const btnReset = document.getElementById("btnReset");
 
 let state = {
@@ -15,6 +14,7 @@ let state = {
   cleanedInput: "",
   leftPointer: 0,
   rightPointer: 0,
+  steps: [],
   currentStep: -1,
   comparisonStatus: null,
   isRunning: false,
@@ -26,6 +26,101 @@ let state = {
 
 function cleanString(str) {
   return str.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function createStep({ left, right, status, result, matchedIndices, message }) {
+  return {
+    left,
+    right,
+    comparisonStatus: status,
+    isFinished: result !== null,
+    result,
+    matchedIndices: [...matchedIndices],
+    message,
+  };
+}
+
+function generateSteps(cleaned) {
+  const steps = [];
+  const matched = new Set();
+  let left = 0;
+  let right = cleaned.length - 1;
+
+  if (cleaned.length === 0) {
+    return steps;
+  }
+
+  steps.push(createStep({
+    left,
+    right,
+    status: null,
+    result: null,
+    matchedIndices: matched,
+    message: "Compare both ends.",
+  }));
+
+  while (left < right) {
+    if (cleaned[left] !== cleaned[right]) {
+      steps.push(createStep({
+        left,
+        right,
+        status: "mismatch",
+        result: false,
+        matchedIndices: matched,
+        message: "Mismatch found.",
+      }));
+      return steps;
+    }
+
+    matched.add(left);
+    matched.add(right);
+    steps.push(createStep({
+      left,
+      right,
+      status: "match",
+      result: null,
+      matchedIndices: matched,
+      message: "Characters match. Move inward.",
+    }));
+
+    left++;
+    right--;
+
+    if (left < right) {
+      steps.push(createStep({
+        left,
+        right,
+        status: null,
+        result: null,
+        matchedIndices: matched,
+        message: "Compare both ends.",
+      }));
+    }
+  }
+
+  if (left === right) matched.add(left);
+
+  steps.push(createStep({
+    left,
+    right,
+    status: null,
+    result: true,
+    matchedIndices: matched,
+    message: "Pointers met. Palindrome confirmed.",
+  }));
+
+  return steps;
+}
+
+function syncStepState() {
+  const step = state.currentStep >= 0 ? state.steps[state.currentStep] : null;
+
+  state.leftPointer = step ? step.left : 0;
+  state.rightPointer = step ? step.right : state.cleanedInput.length - 1;
+  state.comparisonStatus = step ? step.comparisonStatus : null;
+  state.isFinished = Boolean(step && step.isFinished);
+  state.result = step ? step.result : null;
+  state.matchedIndices = new Set(step ? step.matchedIndices : []);
 }
 
 function renderTiles() {
@@ -53,7 +148,7 @@ function renderTiles() {
       if (i === state.rightPointer) tile.classList.add("active-right");
     }
 
-    if (state.comparisonStatus === "mismatch" && !state.isFinished) {
+    if (state.comparisonStatus === "mismatch") {
       if (i === state.leftPointer || i === state.rightPointer) {
         tile.classList.remove("active-left", "active-right", "matched");
         tile.classList.add("mismatched");
@@ -68,10 +163,10 @@ function renderTiles() {
         pointer.textContent = "L / R";
         pointer.classList.add("visible", "left");
       } else if (i === state.leftPointer) {
-        pointer.textContent = "L →";
+        pointer.textContent = "L ->";
         pointer.classList.add("visible", "left");
       } else if (i === state.rightPointer) {
-        pointer.textContent = "← R";
+        pointer.textContent = "<- R";
         pointer.classList.add("visible", "right");
       }
     }
@@ -83,9 +178,11 @@ function renderTiles() {
 }
 
 function updateStepDisplay() {
-  if (state.currentStep < 0) {
-    comparisonText.textContent = "Press Start to begin";
-    stepMessage.textContent = "Enter a string and start the visualizer.";
+  const step = state.currentStep >= 0 ? state.steps[state.currentStep] : null;
+
+  if (!step) {
+    comparisonText.textContent = "Ready";
+    stepMessage.textContent = "Use Next or Play to compare characters.";
     return;
   }
 
@@ -95,102 +192,32 @@ function updateStepDisplay() {
   if (state.isFinished) {
     if (state.result) {
       comparisonText.textContent = "Complete";
-      stepMessage.textContent = "Pointers met — palindrome confirmed.";
     } else {
-      comparisonText.textContent = `${left} ≠ ${right}`;
-      stepMessage.textContent = "Mismatch found.";
+      comparisonText.textContent = `${left} != ${right}`;
     }
+    stepMessage.textContent = step.message;
     return;
   }
 
   if (state.comparisonStatus === "match") {
     comparisonText.textContent = `${left} = ${right}`;
-    stepMessage.textContent = "Characters match — move inward.";
   } else if (state.comparisonStatus === "mismatch") {
-    comparisonText.textContent = `${left} ≠ ${right}`;
-    stepMessage.textContent = "Mismatch found.";
+    comparisonText.textContent = `${left} != ${right}`;
   } else {
     comparisonText.textContent = `${left} ? ${right}`;
-    stepMessage.textContent = "Compare both ends.";
   }
+
+  stepMessage.textContent = step.message;
 }
 
 function showResult() {
   resultBadge.classList.remove("hidden", "palindrome", "not-palindrome");
   if (state.result) {
     resultBadge.classList.add("palindrome");
-    resultBadge.textContent = "Palindrome ✓";
+    resultBadge.textContent = "Palindrome";
   } else {
     resultBadge.classList.add("not-palindrome");
-    resultBadge.textContent = "Not Palindrome ✗";
-  }
-}
-
-function step() {
-  if (state.isFinished) return false;
-
-  const cleaned = state.cleanedInput;
-
-  if (cleaned.length === 0) {
-    state.isFinished = true;
-    state.result = true;
-    showResult();
-    updateStepDisplay();
-    renderTiles();
-    updateButtons();
-    return false;
-  }
-
-  if (state.leftPointer >= state.rightPointer) {
-    state.matchedIndices.add(state.leftPointer);
-    state.isFinished = true;
-    state.result = true;
-    showResult();
-    updateStepDisplay();
-    renderTiles();
-    updateButtons();
-    return false;
-  }
-
-  state.currentStep++;
-  const left = cleaned[state.leftPointer];
-  const right = cleaned[state.rightPointer];
-
-  if (left === right) {
-    state.comparisonStatus = "match";
-    state.matchedIndices.add(state.leftPointer);
-    state.matchedIndices.add(state.rightPointer);
-    updateStepDisplay();
-    renderTiles();
-
-    state.leftPointer++;
-    state.rightPointer--;
-
-    if (state.leftPointer >= state.rightPointer) {
-      if (state.leftPointer === state.rightPointer) {
-        state.matchedIndices.add(state.leftPointer);
-      }
-      state.isFinished = true;
-      state.result = true;
-      setTimeout(() => {
-        showResult();
-        updateStepDisplay();
-        renderTiles();
-        updateButtons();
-      }, 400);
-    }
-    return true;
-  } else {
-    state.comparisonStatus = "mismatch";
-    state.isFinished = true;
-    state.result = false;
-    updateStepDisplay();
-    renderTiles();
-    setTimeout(() => {
-      showResult();
-      updateButtons();
-    }, 400);
-    return false;
+    resultBadge.textContent = "Not Palindrome";
   }
 }
 
@@ -198,27 +225,25 @@ function updateButtons() {
   const hasInput = state.cleanedInput.length > 0;
   const started = state.currentStep >= 0;
 
-  btnStart.disabled = started || !hasInput;
-  btnNext.disabled = state.isFinished || !started;
-  btnAuto.disabled = state.isFinished || !started || state.isRunning;
-  btnPause.disabled = !state.isRunning;
+  btnPrev.disabled = !started || state.currentStep <= 0;
+  btnNext.disabled = !hasInput || !started || state.isFinished;
+  btnPlay.disabled = !hasInput || !started || state.isFinished;
+  btnPlay.textContent = state.isRunning ? "Pause" : "Play";
   btnReset.disabled = false;
-
-  btnStart.classList.toggle("primary", !started && hasInput);
 }
 
 function initialize() {
   stopAuto();
   state.originalInput = input.value;
   state.cleanedInput = cleanString(input.value);
-  state.leftPointer = 0;
-  state.rightPointer = state.cleanedInput.length - 1;
-  state.currentStep = -1;
-  state.comparisonStatus = null;
+  state.steps = generateSteps(state.cleanedInput);
+  state.currentStep = state.cleanedInput.length > 0 ? 0 : -1;
   state.isRunning = false;
   state.isFinished = false;
   state.result = null;
   state.matchedIndices = new Set();
+  syncStepState();
+
   resultBadge.classList.add("hidden");
   cleanedTextEl.textContent = state.cleanedInput || "(empty)";
   renderTiles();
@@ -226,21 +251,30 @@ function initialize() {
   updateButtons();
 }
 
-function startViz() {
-  initialize();
-  state.currentStep = 0;
+function stepForward() {
+  if (state.isFinished || state.currentStep >= state.steps.length - 1) return false;
 
-  if (state.cleanedInput.length === 0) {
-    state.isFinished = true;
-    state.result = true;
-    showResult();
-    updateStepDisplay();
-    renderTiles();
+  state.currentStep++;
+  syncStepState();
+  renderTiles();
+  updateStepDisplay();
+
+  if (state.isFinished) {
     updateButtons();
-    return;
+    setTimeout(showResult, 400);
+    return false;
   }
 
-  state.comparisonStatus = null;
+  updateButtons();
+  return true;
+}
+
+function stepBack() {
+  if (state.currentStep <= 0) return;
+  stopAuto();
+  resultBadge.classList.add("hidden");
+  state.currentStep--;
+  syncStepState();
   renderTiles();
   updateStepDisplay();
   updateButtons();
@@ -258,7 +292,7 @@ function autoPlay() {
   state.isRunning = true;
   updateButtons();
   state.autoInterval = setInterval(() => {
-    const canContinue = step();
+    const canContinue = stepForward();
     if (!canContinue) {
       stopAuto();
       updateButtons();
@@ -266,31 +300,25 @@ function autoPlay() {
   }, 900);
 }
 
-btnStart.addEventListener("click", startViz);
+btnPrev.addEventListener("click", stepBack);
 btnNext.addEventListener("click", () => {
-  step();
+  stepForward();
   updateButtons();
 });
-btnAuto.addEventListener("click", autoPlay);
-btnPause.addEventListener("click", () => {
-  stopAuto();
-  updateButtons();
+btnPlay.addEventListener("click", () => {
+  if (state.isRunning) {
+    stopAuto();
+    updateButtons();
+  } else {
+    autoPlay();
+  }
 });
 btnReset.addEventListener("click", initialize);
 
-input.addEventListener("input", () => {
-  if (state.currentStep < 0) {
-    state.cleanedInput = cleanString(input.value);
-    cleanedTextEl.textContent = state.cleanedInput || "(empty)";
-    renderTiles();
-    updateButtons();
-  }
-});
+input.addEventListener("input", initialize);
 
 input.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    if (state.currentStep < 0) startViz();
-  }
+  if (e.key === "Enter") stepForward();
 });
 
 initialize();

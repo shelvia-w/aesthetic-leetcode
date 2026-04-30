@@ -85,6 +85,39 @@ const problems = [
     accent: "violet",
     categories: ["Strings", "Two Pointers"],
   },
+  {
+    slug: "3sum",
+    title: "3Sum",
+    pattern: "Two Pointers",
+    difficulty: "Medium",
+    timeComplexity: "O(n²)",
+    spaceComplexity: "O(1)",
+    description:
+      "Find all unique triplets in an integer array whose values sum to zero.",
+    statement:
+      "Find all unique triplets in an integer array whose values sum to zero.",
+    examples: [
+      {
+        input: "nums = [-1, 0, 1, 2, -1, -4]",
+        output: "[[-1, -1, 2], [-1, 0, 1]]",
+        explanation:
+          "nums[0] + nums[1] + nums[2] = (-1) + 0 + 1 = 0.<br>nums[1] + nums[2] + nums[4] = 0 + 1 + (-1) = 0.<br>nums[0] + nums[3] + nums[4] = (-1) + 2 + (-1) = 0.<br>The distinct triplets are [-1,0,1] and [-1,-1,2].<br>Notice that the order of the output and the order of the triplets does not matter.",
+      },
+      {
+        input: "nums = [0, 1, 1]",
+        output: "[]",
+        explanation: "No three numbers sum to zero.",
+      },
+      {
+        input: "nums = [0, 0, 0]",
+        output: "[[0, 0, 0]]",
+        explanation: "The only valid unique triplet is three zeros.",
+      },
+    ],
+    imagePath: "public/images/3sum.png",
+    accent: "rose",
+    categories: ["Arrays", "Two Pointers", "Sorting"],
+  },
 ];
 
 const filters = ["All", ...new Set(problems.flatMap((problem) => problem.categories))];
@@ -131,7 +164,7 @@ const concepts = [
             description: "Use sorted order to adjust the sum by moving the lower or higher side.",
             problems: [
               { title: "Two Sum II", slug: "two-sum-ii" },
-              { title: "3Sum" },
+              { title: "3Sum", slug: "3sum" },
             ],
           },
           {

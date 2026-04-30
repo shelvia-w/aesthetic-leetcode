@@ -7,10 +7,9 @@ const resultArea = document.getElementById("resultArea");
 const resultBadge = document.getElementById("resultBadge");
 const resultDetails = document.getElementById("resultDetails");
 const sortWarning = document.getElementById("sortWarning");
-const btnStart = document.getElementById("btnStart");
+const btnPrev = document.getElementById("btnPrev");
 const btnNext = document.getElementById("btnNext");
-const btnAuto = document.getElementById("btnAuto");
-const btnPause = document.getElementById("btnPause");
+const btnPlay = document.getElementById("btnPlay");
 const btnReset = document.getElementById("btnReset");
 
 let state = {
@@ -19,6 +18,7 @@ let state = {
   wasSorted: false,
   leftPointer: 0,
   rightPointer: 0,
+  steps: [],
   currentStep: -1,
   isRunning: false,
   isFinished: false,
@@ -42,6 +42,90 @@ function isSorted(arr) {
     if (arr[i] < arr[i - 1]) return false;
   }
   return true;
+}
+
+function generateSteps(numbers, target) {
+  const steps = [];
+  let left = 0;
+  let right = numbers.length - 1;
+
+  if (numbers.length < 2) {
+    steps.push({
+      left,
+      right,
+      sum: null,
+      isFinished: true,
+      result: false,
+      foundIndices: null,
+      message: "Need at least 2 numbers.",
+    });
+    return steps;
+  }
+
+  steps.push({
+    left,
+    right,
+    sum: null,
+    isFinished: false,
+    result: null,
+    foundIndices: null,
+    message: "Enter a sorted array and target, then start.",
+  });
+
+  while (left < right) {
+    const sum = numbers[left] + numbers[right];
+
+    if (sum === target) {
+      steps.push({
+        left,
+        right,
+        sum,
+        isFinished: true,
+        result: true,
+        foundIndices: [left, right],
+        message: `${sum} = ${target}, answer found!`,
+      });
+      return steps;
+    }
+
+    steps.push({
+      left,
+      right,
+      sum,
+      isFinished: false,
+      result: null,
+      foundIndices: null,
+      message: sum > target ? `${sum} > ${target}, move R left.` : `${sum} < ${target}, move L right.`,
+    });
+
+    if (sum > target) {
+      right--;
+    } else {
+      left++;
+    }
+  }
+
+  steps.push({
+    left,
+    right,
+    sum: null,
+    isFinished: true,
+    result: false,
+    foundIndices: null,
+    message: "No valid pair found.",
+  });
+
+  return steps;
+}
+
+function syncStepState() {
+  const step = state.currentStep >= 0 ? state.steps[state.currentStep] : null;
+
+  state.leftPointer = step ? step.left : 0;
+  state.rightPointer = step ? step.right : state.numbers.length - 1;
+  state.isFinished = Boolean(step && step.isFinished);
+  state.result = step ? step.result : null;
+  state.foundIndices = step ? step.foundIndices : null;
 }
 
 function renderTiles() {
@@ -104,16 +188,18 @@ function renderTiles() {
 }
 
 function updateStepDisplay() {
-  if (state.currentStep < 0) {
+  const step = state.currentStep >= 0 ? state.steps[state.currentStep] : null;
+
+  if (!step) {
     comparisonText.textContent = "Press Start to begin";
     stepMessage.textContent = "Enter a sorted array and target, then start.";
     return;
   }
 
-  if (state.isFinished) {
-    if (state.foundIndices) {
-      const l = state.foundIndices[0];
-      const r = state.foundIndices[1];
+  if (step.isFinished) {
+    if (step.foundIndices) {
+      const l = step.foundIndices[0];
+      const r = step.foundIndices[1];
       const lv = state.numbers[l];
       const rv = state.numbers[r];
       comparisonText.textContent = `${lv} + ${rv} = ${state.target}`;
@@ -125,19 +211,14 @@ function updateStepDisplay() {
     return;
   }
 
-  const lv = state.numbers[state.leftPointer];
-  const rv = state.numbers[state.rightPointer];
-  const sum = lv + rv;
-
-  comparisonText.textContent = `${lv} + ${rv} = ${sum}`;
-
-  if (sum === state.target) {
-    stepMessage.textContent = `${sum} = ${state.target}, answer found!`;
-  } else if (sum > state.target) {
-    stepMessage.textContent = `${sum} > ${state.target}, move R left.`;
-  } else {
-    stepMessage.textContent = `${sum} < ${state.target}, move L right.`;
+  if (step.sum === null) {
+    comparisonText.textContent = "Ready";
+    stepMessage.textContent = step.message;
+    return;
   }
+
+  comparisonText.textContent = `${state.numbers[step.left]} + ${state.numbers[step.right]} = ${step.sum}`;
+  stepMessage.textContent = step.message;
 }
 
 function showResult() {
@@ -170,66 +251,15 @@ function showResult() {
   }
 }
 
-function step() {
-  if (state.isFinished) return false;
-
-  if (state.leftPointer >= state.rightPointer) {
-    state.isFinished = true;
-    state.result = false;
-    state.foundIndices = null;
-    updateStepDisplay();
-    renderTiles();
-    showResult();
-    updateButtons();
-    return false;
-  }
-
-  state.currentStep++;
-  const lv = state.numbers[state.leftPointer];
-  const rv = state.numbers[state.rightPointer];
-  const sum = lv + rv;
-
-  updateStepDisplay();
-  renderTiles();
-
-  if (sum === state.target) {
-    state.isFinished = true;
-    state.result = true;
-    state.foundIndices = [state.leftPointer, state.rightPointer];
-    setTimeout(() => {
-      updateStepDisplay();
-      renderTiles();
-      showResult();
-      updateButtons();
-    }, 400);
-    return false;
-  } else if (sum > state.target) {
-    state.rightPointer--;
-  } else {
-    state.leftPointer++;
-  }
-
-  if (state.leftPointer >= state.rightPointer && !state.isFinished) {
-    const newSum = state.numbers[state.leftPointer] + state.numbers[state.rightPointer];
-    if (state.leftPointer === state.rightPointer || newSum !== state.target) {
-      return true;
-    }
-  }
-
-  return true;
-}
-
 function updateButtons() {
   const hasInput = state.numbers.length >= 2;
   const started = state.currentStep >= 0;
 
-  btnStart.disabled = started || !hasInput;
-  btnNext.disabled = state.isFinished || !started;
-  btnAuto.disabled = state.isFinished || !started || state.isRunning;
-  btnPause.disabled = !state.isRunning;
+  btnPrev.disabled = !started || state.currentStep <= 0;
+  btnNext.disabled = !hasInput || !started || state.isFinished;
+  btnPlay.disabled = !hasInput || !started || state.isFinished;
+  btnPlay.textContent = state.isRunning ? "Pause" : "Play";
   btnReset.disabled = false;
-
-  btnStart.classList.toggle("primary", !started && hasInput);
 }
 
 function initialize() {
@@ -249,13 +279,15 @@ function initialize() {
   }
 
   state.target = Number(targetInput.value) || 0;
+  state.steps = generateSteps(state.numbers, state.target);
   state.leftPointer = 0;
   state.rightPointer = state.numbers.length - 1;
-  state.currentStep = -1;
+  state.currentStep = state.numbers.length >= 2 ? 0 : -1;
   state.isRunning = false;
   state.isFinished = false;
   state.result = null;
   state.foundIndices = null;
+  syncStepState();
 
   resultArea.classList.add("hidden");
   renderTiles();
@@ -263,21 +295,30 @@ function initialize() {
   updateButtons();
 }
 
-function startViz() {
-  initialize();
+function stepForward() {
+  if (state.isFinished || state.currentStep >= state.steps.length - 1) return false;
 
-  if (state.numbers.length < 2) {
-    state.isFinished = true;
-    state.result = false;
-    state.foundIndices = null;
-    showResult();
-    updateStepDisplay();
-    renderTiles();
+  state.currentStep++;
+  syncStepState();
+  renderTiles();
+  updateStepDisplay();
+
+  if (state.isFinished) {
     updateButtons();
-    return;
+    setTimeout(showResult, 400);
+    return false;
   }
 
-  state.currentStep = 0;
+  updateButtons();
+  return true;
+}
+
+function stepBack() {
+  if (state.currentStep <= 0) return;
+  stopAuto();
+  resultArea.classList.add("hidden");
+  state.currentStep--;
+  syncStepState();
   renderTiles();
   updateStepDisplay();
   updateButtons();
@@ -295,7 +336,7 @@ function autoPlay() {
   state.isRunning = true;
   updateButtons();
   state.autoInterval = setInterval(() => {
-    const canContinue = step();
+    const canContinue = stepForward();
     if (!canContinue) {
       stopAuto();
       updateButtons();
@@ -303,23 +344,34 @@ function autoPlay() {
   }, 900);
 }
 
-btnStart.addEventListener("click", startViz);
+btnPrev.addEventListener("click", stepBack);
 btnNext.addEventListener("click", () => {
-  step();
+  stepForward();
   updateButtons();
 });
-btnAuto.addEventListener("click", autoPlay);
-btnPause.addEventListener("click", () => {
-  stopAuto();
-  updateButtons();
+btnPlay.addEventListener("click", () => {
+  if (state.isRunning) {
+    stopAuto();
+    updateButtons();
+  } else {
+    autoPlay();
+  }
 });
 btnReset.addEventListener("click", initialize);
 
 arrayInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && state.currentStep < 0) startViz();
+  if (e.key === "Enter") stepForward();
 });
 targetInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && state.currentStep < 0) startViz();
+  if (e.key === "Enter") stepForward();
+});
+
+arrayInput.addEventListener("input", () => {
+  initialize();
+});
+
+targetInput.addEventListener("input", () => {
+  initialize();
 });
 
 initialize();

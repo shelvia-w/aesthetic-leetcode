@@ -5,10 +5,9 @@ const resultArea = document.getElementById("resultArea");
 const resultBadge = document.getElementById("resultBadge");
 const resultDetails = document.getElementById("resultDetails");
 const swapArrow = document.getElementById("swapArrow");
-const btnStart = document.getElementById("btnStart");
+const btnPrev = document.getElementById("btnPrev");
 const btnNext = document.getElementById("btnNext");
-const btnAuto = document.getElementById("btnAuto");
-const btnPause = document.getElementById("btnPause");
+const btnPlay = document.getElementById("btnPlay");
 const btnReset = document.getElementById("btnReset");
 
 let state = {
@@ -16,6 +15,7 @@ let state = {
   original: [],
   leftPointer: 0,
   rightPointer: 0,
+  steps: [],
   currentStep: -1,
   phase: "highlight",
   isRunning: false,
@@ -26,6 +26,101 @@ let state = {
 
 function parseChars(str) {
   return Array.from(str.trim());
+}
+
+function createStep({ chars, left, right, phase, isFinished, swappedSet, message }) {
+  return {
+    chars: [...chars],
+    left,
+    right,
+    phase,
+    isFinished,
+    swappedSet: [...swappedSet],
+    message,
+  };
+}
+
+function generateSteps(original) {
+  const steps = [];
+  const chars = [...original];
+  const swapped = new Set();
+  let left = 0;
+  let right = chars.length - 1;
+
+  if (chars.length === 0) {
+    return steps;
+  }
+
+  if (chars.length === 1) {
+    swapped.add(0);
+    steps.push(createStep({
+      chars,
+      left,
+      right,
+      phase: "done",
+      isFinished: true,
+      swappedSet: swapped,
+      message: "String reversed in-place!",
+    }));
+    return steps;
+  }
+
+  while (left < right) {
+    steps.push(createStep({
+      chars,
+      left,
+      right,
+      phase: "highlight",
+      isFinished: false,
+      swappedSet: swapped,
+      message: `Compare positions ${left} and ${right}. Ready to swap.`,
+    }));
+
+    const leftValue = chars[left];
+    const rightValue = chars[right];
+    chars[left] = rightValue;
+    chars[right] = leftValue;
+    swapped.add(left);
+    swapped.add(right);
+
+    steps.push(createStep({
+      chars,
+      left,
+      right,
+      phase: "swap",
+      isFinished: false,
+      swappedSet: swapped,
+      message: `Swapped "${rightValue}" and "${leftValue}". Move L right, R left.`,
+    }));
+
+    left++;
+    right--;
+  }
+
+  if (left === right) swapped.add(left);
+
+  steps.push(createStep({
+    chars,
+    left,
+    right,
+    phase: "done",
+    isFinished: true,
+    swappedSet: swapped,
+    message: "String reversed in-place!",
+  }));
+
+  return steps;
+}
+
+function syncStepState() {
+  const step = state.currentStep >= 0 ? state.steps[state.currentStep] : null;
+
+  state.chars = step ? [...step.chars] : [...state.original];
+  state.leftPointer = step ? step.left : 0;
+  state.rightPointer = step ? step.right : state.chars.length - 1;
+  state.phase = step ? step.phase : "highlight";
+  state.isFinished = Boolean(step && step.isFinished);
+  state.swappedSet = new Set(step ? step.swappedSet : []);
 }
 
 function renderTiles() {
@@ -65,10 +160,10 @@ function renderTiles() {
         pointer.textContent = "L / R";
         pointer.classList.add("left");
       } else if (i === state.leftPointer) {
-        pointer.textContent = "L →";
+        pointer.textContent = "L ->";
         pointer.classList.add("left");
       } else if (i === state.rightPointer) {
-        pointer.textContent = "← R";
+        pointer.textContent = "<- R";
         pointer.classList.add("right");
       }
     }
@@ -81,30 +176,16 @@ function renderTiles() {
 }
 
 function updateStepDisplay() {
-  if (state.currentStep < 0) {
-    stepMessage.textContent = "Enter a string, then start.";
+  const step = state.currentStep >= 0 ? state.steps[state.currentStep] : null;
+
+  if (!step) {
+    stepMessage.textContent = "Use Next or Play to swap characters.";
     swapArrow.classList.add("hidden");
     return;
   }
 
-  if (state.isFinished) {
-    stepMessage.textContent = "String reversed in-place!";
-    swapArrow.classList.add("hidden");
-    return;
-  }
-
-  const l = state.leftPointer;
-  const r = state.rightPointer;
-  const lv = state.chars[l];
-  const rv = state.chars[r];
-
-  if (state.phase === "highlight") {
-    stepMessage.textContent = `Compare positions ${l} and ${r}. Ready to swap.`;
-    swapArrow.classList.remove("hidden");
-  } else {
-    stepMessage.textContent = `Swapped "${rv}" and "${lv}". Move L right, R left.`;
-    swapArrow.classList.add("hidden");
-  }
+  stepMessage.textContent = step.message;
+  swapArrow.classList.toggle("hidden", state.phase !== "highlight" || state.isFinished);
 }
 
 function showResult() {
@@ -131,80 +212,27 @@ function showResult() {
   `;
 }
 
-function step() {
-  if (state.isFinished) return false;
-
-  if (state.leftPointer >= state.rightPointer) {
-    state.isFinished = true;
-    updateStepDisplay();
-    renderTiles();
-    showResult();
-    updateButtons();
-    return false;
-  }
-
-  if (state.phase === "highlight") {
-    state.phase = "swap";
-    const l = state.leftPointer;
-    const r = state.rightPointer;
-    const tmp = state.chars[l];
-    state.chars[l] = state.chars[r];
-    state.chars[r] = tmp;
-    state.swappedSet.add(l);
-    state.swappedSet.add(r);
-    updateStepDisplay();
-    renderTiles();
-    return true;
-  }
-
-  state.leftPointer++;
-  state.rightPointer--;
-  state.phase = "highlight";
-  state.currentStep++;
-
-  if (state.leftPointer >= state.rightPointer) {
-    if (state.leftPointer === state.rightPointer) {
-      state.swappedSet.add(state.leftPointer);
-    }
-    state.isFinished = true;
-    updateStepDisplay();
-    renderTiles();
-    showResult();
-    updateButtons();
-    return false;
-  }
-
-  updateStepDisplay();
-  renderTiles();
-  return true;
-}
-
 function updateButtons() {
-  const hasInput = state.chars.length >= 1;
+  const hasInput = state.original.length >= 1;
   const started = state.currentStep >= 0;
 
-  btnStart.disabled = started || !hasInput;
-  btnNext.disabled = state.isFinished || !started;
-  btnAuto.disabled = state.isFinished || !started || state.isRunning;
-  btnPause.disabled = !state.isRunning;
+  btnPrev.disabled = !started || state.currentStep <= 0;
+  btnNext.disabled = !hasInput || !started || state.isFinished;
+  btnPlay.disabled = !hasInput || !started || state.isFinished;
+  btnPlay.textContent = state.isRunning ? "Pause" : "Play";
   btnReset.disabled = false;
-
-  btnStart.classList.toggle("primary", !started && hasInput);
 }
 
 function initialize() {
   stopAuto();
 
   const raw = parseChars(arrayInput.value);
-  state.chars = raw;
   state.original = [...raw];
-  state.leftPointer = 0;
-  state.rightPointer = raw.length - 1;
-  state.currentStep = -1;
-  state.phase = "highlight";
+  state.steps = generateSteps(raw);
+  state.currentStep = raw.length >= 1 ? 0 : -1;
   state.isRunning = false;
   state.isFinished = false;
-  state.swappedSet = new Set();
+  syncStepState();
 
   resultArea.classList.add("hidden");
   renderTiles();
@@ -212,25 +240,30 @@ function initialize() {
   updateButtons();
 }
 
-function startViz() {
-  initialize();
+function stepForward() {
+  if (state.isFinished || state.currentStep >= state.steps.length - 1) return false;
 
-  if (state.chars.length === 0) {
-    return;
-  }
+  state.currentStep++;
+  syncStepState();
+  renderTiles();
+  updateStepDisplay();
 
-  if (state.chars.length === 1) {
-    state.currentStep = 0;
-    state.isFinished = true;
-    state.swappedSet.add(0);
-    renderTiles();
-    updateStepDisplay();
-    showResult();
+  if (state.isFinished) {
     updateButtons();
-    return;
+    setTimeout(showResult, 400);
+    return false;
   }
 
-  state.currentStep = 0;
+  updateButtons();
+  return true;
+}
+
+function stepBack() {
+  if (state.currentStep <= 0) return;
+  stopAuto();
+  resultArea.classList.add("hidden");
+  state.currentStep--;
+  syncStepState();
   renderTiles();
   updateStepDisplay();
   updateButtons();
@@ -248,7 +281,7 @@ function autoPlay() {
   state.isRunning = true;
   updateButtons();
   state.autoInterval = setInterval(() => {
-    const canContinue = step();
+    const canContinue = stepForward();
     if (!canContinue) {
       stopAuto();
       updateButtons();
@@ -256,20 +289,25 @@ function autoPlay() {
   }, 700);
 }
 
-btnStart.addEventListener("click", startViz);
+btnPrev.addEventListener("click", stepBack);
 btnNext.addEventListener("click", () => {
-  step();
+  stepForward();
   updateButtons();
 });
-btnAuto.addEventListener("click", autoPlay);
-btnPause.addEventListener("click", () => {
-  stopAuto();
-  updateButtons();
+btnPlay.addEventListener("click", () => {
+  if (state.isRunning) {
+    stopAuto();
+    updateButtons();
+  } else {
+    autoPlay();
+  }
 });
 btnReset.addEventListener("click", initialize);
 
+arrayInput.addEventListener("input", initialize);
+
 arrayInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && state.currentStep < 0) startViz();
+  if (e.key === "Enter") stepForward();
 });
 
 initialize();

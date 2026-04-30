@@ -36,6 +36,7 @@ if (problem && detailPage) {
     "valid-palindrome": "../tools/valid-palindrome-visualizer.html",
     "two-sum-ii": "../tools/two-sum-ii-visualizer.html",
     "reverse-string": "../tools/reverse-string-visualizer.html",
+    "3sum": "../tools/3sum-visualizer.html",
   };
   const vizLink = visualizerLinks[problem.slug];
   const vizCta = vizLink

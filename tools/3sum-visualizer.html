@@ -3,60 +3,69 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Two Sum II Visualizer | Aesthetic LeetCode</title>
-    <meta name="description" content="Interactive two-pointer visualizer for Two Sum II" />
+    <title>3Sum Visualizer | Aesthetic LeetCode</title>
+    <meta name="description" content="Interactive three-pointer visualizer for 3Sum" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="two-sum-ii-visualizer.css" />
+    <link rel="stylesheet" href="3sum-visualizer.css" />
   </head>
   <body>
     <main class="viz-shell">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="../index.html">Problems</a>
         <span class="breadcrumb-sep" aria-hidden="true">/</span>
-        <a href="../problems/two-sum-ii.html">Two Sum II</a>
+        <a href="../problems/3sum.html">3Sum</a>
         <span class="breadcrumb-sep" aria-hidden="true">/</span>
         <span aria-current="page">Visualizer</span>
       </nav>
 
       <header class="viz-header">
-        <h1>Two Sum II Visualizer</h1>
-        <p class="viz-subtitle">Watch two pointers narrow in on the target sum.</p>
+        <h1>3Sum Visualizer</h1>
+        <p class="viz-subtitle">Fix one number, then use two pointers to find pairs that complete a zero sum.</p>
       </header>
 
       <section class="input-section" aria-label="Input">
-        <div class="input-row">
+        <div class="input-col">
           <label class="input-wrap">
-            <span class="input-label">Numbers (sorted array)</span>
-            <input id="arrayInput" type="text" value="2, 7, 11, 15" autocomplete="off" spellcheck="false" />
-          </label>
-          <label class="input-wrap input-wrap--target">
-            <span class="input-label">Target</span>
-            <input id="targetInput" type="number" value="9" autocomplete="off" />
+            <span class="input-label">Array</span>
+            <input id="arrayInput" type="text" value="-1, 0, 1, 2, -1, -4" autocomplete="off" spellcheck="false" />
           </label>
         </div>
-        <p class="sort-warning hidden" id="sortWarning">Two Sum II expects a sorted array. Auto-sorted for visualization.</p>
       </section>
 
       <section class="visualizer-card" aria-label="Visualization">
-        <div class="tiles-container" id="tilesContainer"></div>
+        <div class="arrays-wrapper">
+          <div class="array-row" id="originalArrayRow">
+            <span class="array-row-label">Original</span>
+            <div class="tiles-container" id="originalTilesContainer"></div>
+          </div>
+          <div class="array-row" id="sortedArrayRow">
+            <span class="array-row-label">Sorted</span>
+            <div class="tiles-container" id="tilesContainer"></div>
+          </div>
+        </div>
 
-        <div class="step-state" id="stepState">
-          <p class="comparison" id="comparisonText">Press Start to begin</p>
-          <p class="step-message" id="stepMessage">Enter a sorted array and target, then start.</p>
+        <div class="step-state">
+          <p class="comparison" id="comparisonText">Press Sort to begin</p>
+          <p class="step-message" id="stepMessage"></p>
+        </div>
+
+        <div class="triplets-panel hidden" id="tripletsPanel">
+          <p class="triplets-label">Found triplets</p>
+          <div class="triplets-list" id="tripletsList"></div>
         </div>
 
         <div class="result-area hidden" id="resultArea">
           <div class="result-badge" id="resultBadge"></div>
-          <div class="result-details" id="resultDetails"></div>
         </div>
       </section>
 
       <section class="controls" aria-label="Controls">
+        <button class="ctrl-btn primary" id="btnSort" type="button">Sort</button>
         <button class="ctrl-btn" id="btnPrev" type="button" disabled>Prev</button>
         <button class="ctrl-btn" id="btnNext" type="button" disabled>Next</button>
         <button class="ctrl-btn" id="btnPlay" type="button" disabled>Play</button>
@@ -69,21 +78,21 @@
           <div class="learning-steps">
             <div class="learning-step">
               <span class="step-num">1</span>
-              <span>Place pointers at the start and end of the sorted array</span>
+              <span>Sort the array so duplicates are adjacent and two-pointer search works</span>
             </div>
             <div class="learning-step">
               <span class="step-num">2</span>
-              <span>If the sum is too large, move the right pointer left</span>
+              <span>Fix index <strong>i</strong> and place <strong>L</strong> and <strong>R</strong> at the remaining ends</span>
             </div>
             <div class="learning-step">
               <span class="step-num">3</span>
-              <span>If the sum is too small, move the left pointer right</span>
+              <span>Move pointers inward based on the sum. Skip duplicates to avoid repeat triplets</span>
             </div>
           </div>
         </section>
       </div>
     </main>
 
-    <script src="two-sum-ii-visualizer.js"></script>
+    <script src="3sum-visualizer.js"></script>
   </body>
 </html>
