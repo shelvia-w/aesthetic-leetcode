@@ -40,7 +40,7 @@ if (problem && detailPage) {
   };
   const vizLink = visualizerLinks[problem.slug];
   const vizCta = vizLink
-    ? `<a class="viz-cta" href="${vizLink}"><span class="viz-cta-icon" aria-hidden="true">▶</span> Open Interactive Visualizer</a>`
+    ? `<a class="viz-cta" href="${vizLink}"><span class="viz-cta-icon" aria-hidden="true">▶</span><span class="viz-cta-label-mobile">Visualizer</span><span class="viz-cta-label-full">Open Interactive Visualizer</span></a>`
     : "";
 
   detailPage.innerHTML = `

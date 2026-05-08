@@ -5,10 +5,17 @@ const state = {
 
 const grid = document.querySelector("#problemGrid");
 const filtersNode = document.querySelector("#filters");
+const filterShell = document.querySelector(".filter-shell");
+const filterTrigger = document.querySelector(".filter-trigger");
+const activeFilterLabel = document.querySelector("#activeFilterLabel");
 const searchInput = document.querySelector("#searchInput");
 const emptyState = document.querySelector("#emptyState");
+const aboutDrawer = document.querySelector("#aboutDrawer");
+const aboutTrigger = document.querySelector(".about-trigger");
+const aboutDrawerCloseButtons = document.querySelectorAll(".about-drawer-close, .about-drawer-scrim");
 
 function renderFilters() {
+  activeFilterLabel.textContent = state.activeFilter;
   filtersNode.innerHTML = filters
     .map(
       (filter) => `
@@ -18,6 +25,11 @@ function renderFilters() {
       `,
     )
     .join("");
+}
+
+function setFilterMenuOpen(isOpen) {
+  filterShell.classList.toggle("is-open", isOpen);
+  filterTrigger.setAttribute("aria-expanded", String(isOpen));
 }
 
 function getVisibleProblems() {
@@ -76,11 +88,57 @@ filtersNode.addEventListener("click", (event) => {
   state.activeFilter = button.dataset.filter;
   renderFilters();
   renderProblems();
+  setFilterMenuOpen(false);
+});
+
+filterTrigger.addEventListener("click", () => {
+  setFilterMenuOpen(!filterShell.classList.contains("is-open"));
 });
 
 searchInput.addEventListener("input", (event) => {
   state.query = event.target.value;
   renderProblems();
+});
+
+function setAboutDrawerOpen(isOpen) {
+  aboutDrawer.classList.toggle("is-open", isOpen);
+  aboutDrawer.setAttribute("aria-hidden", String(!isOpen));
+  aboutTrigger.setAttribute("aria-expanded", String(isOpen));
+  document.body.classList.toggle("has-open-drawer", isOpen);
+
+  if (isOpen) {
+    aboutDrawer.querySelector(".about-drawer-close").focus();
+  } else {
+    aboutTrigger.focus();
+  }
+}
+
+aboutTrigger.addEventListener("click", () => {
+  setAboutDrawerOpen(true);
+});
+
+aboutDrawerCloseButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setAboutDrawerOpen(false);
+  });
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && filterShell.classList.contains("is-open")) {
+    setFilterMenuOpen(false);
+    filterTrigger.focus();
+    return;
+  }
+
+  if (event.key === "Escape" && aboutDrawer.classList.contains("is-open")) {
+    setAboutDrawerOpen(false);
+  }
+});
+
+document.addEventListener("click", (event) => {
+  if (!filterShell.contains(event.target)) {
+    setFilterMenuOpen(false);
+  }
 });
 
 renderFilters();
