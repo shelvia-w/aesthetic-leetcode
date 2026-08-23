@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Valid Anagram Visualizer | Aesthetic LeetCode</title>
+    <meta name="description" content="Interactive hashmap visualizer for Valid Anagram" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="valid-anagram-visualizer.css" />
+  </head>
+  <body>
+    <main class="viz-shell">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Problems</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <a href="../problems/valid-anagram.html">Valid Anagram</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <span aria-current="page">Visualizer</span>
+      </nav>
+
+      <header class="viz-header">
+        <h1>Valid Anagram Visualizer</h1>
+        <p class="viz-subtitle">Build a character-count hashmap, then balance it back to zero.</p>
+      </header>
+
+      <section class="input-section" aria-label="String inputs">
+        <div class="input-row">
+          <label class="input-wrap">
+            <span class="input-label">String s</span>
+            <input id="inputS" type="text" value="anagram" autocomplete="off" spellcheck="false" />
+          </label>
+          <label class="input-wrap">
+            <span class="input-label">String t</span>
+            <input id="inputT" type="text" value="nagaram" autocomplete="off" spellcheck="false" />
+          </label>
+        </div>
+      </section>
+
+      <section class="visualizer-card" aria-label="Hashmap visualization">
+        <div class="string-rows" id="stringRows"></div>
+
+        <div class="map-section">
+          <div class="map-heading">
+            <span>Character hashmap</span>
+            <span class="phase-badge" id="phaseBadge">Ready</span>
+          </div>
+          <div class="hashmap" id="hashmap" aria-live="polite"></div>
+        </div>
+
+        <div class="step-state">
+          <p class="operation" id="operationText">count each character in s</p>
+          <p class="step-message" id="stepMessage">Use Next or Play to begin.</p>
+        </div>
+
+        <div class="result-badge hidden" id="resultBadge"></div>
+      </section>
+
+      <section class="controls" aria-label="Controls">
+        <button class="ctrl-btn" id="btnPrev" type="button" disabled>Prev</button>
+        <button class="ctrl-btn" id="btnNext" type="button">Next</button>
+        <button class="ctrl-btn" id="btnPlay" type="button">Play</button>
+        <button class="ctrl-btn" id="btnReset" type="button">Reset</button>
+      </section>
+
+      <div class="bottom-cards">
+        <section class="info-card" aria-label="How it works">
+          <h2>How It Works</h2>
+          <div class="learning-steps">
+            <div class="learning-step">
+              <span class="step-num">1</span>
+              <span>If the lengths differ, the strings cannot be anagrams</span>
+            </div>
+            <div class="learning-step">
+              <span class="step-num">2</span>
+              <span>Count every character in <code>s</code> with a hashmap</span>
+            </div>
+            <div class="learning-step">
+              <span class="step-num">3</span>
+              <span>Decrement each character from <code>t</code>; every count must reach zero</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="valid-anagram-visualizer.js"></script>
+  </body>
+</html>

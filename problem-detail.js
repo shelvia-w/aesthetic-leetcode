@@ -34,6 +34,7 @@ if (problem && detailPage) {
 
   const visualizerLinks = {
     "valid-palindrome": "../tools/valid-palindrome-visualizer.html",
+    "valid-anagram": "../tools/valid-anagram-visualizer.html",
     "two-sum-ii": "../tools/two-sum-ii-visualizer.html",
     "reverse-string": "../tools/reverse-string-visualizer.html",
     "3sum": "../tools/3sum-visualizer.html",

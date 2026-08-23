@@ -62,6 +62,30 @@ const problems = [
     categories: ["Strings", "Two Pointers"],
   },
   {
+    slug: "valid-anagram",
+    title: "Valid Anagram",
+    pattern: "Hashing",
+    difficulty: "Easy",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(1)",
+    description: "Check whether two strings contain the same characters with the same frequencies.",
+    statement:
+      "Given two strings s and t, return true if t is an anagram of s, and false otherwise.",
+    examples: [
+      {
+        input: 's = "anagram", t = "nagaram"',
+        output: "true",
+      },
+      {
+        input: 's = "rat", t = "car"',
+        output: "false",
+      },
+    ],
+    imagePath: "public/images/valid-anagram.png",
+    accent: "rose",
+    categories: ["Strings", "Hash Table", "Sorting"],
+  },
+  {
     slug: "reverse-string",
     title: "Reverse String",
     pattern: "Two Pointers",
